@@ -1,6 +1,6 @@
 import { addDays, subDays, startOfDay, eachDayOfInterval } from "date-fns";
 
-import { TStaffWithSchedule } from "@/actions/staff";
+import { TStaffWithSchedule } from "@/action/staff";
 
 export type TDepartment = "甲板部" | "機関部" | "司厨部";
 export type TSortedStaff =
