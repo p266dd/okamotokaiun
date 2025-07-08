@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 
-// import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/sonner";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${outfit.variable} font-english antialiased`}>
         {children}
-        {/* <Toaster position="top-center" richColors /> */}
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );

@@ -1,13 +1,18 @@
-import { PrismaClient } from "./prisma/generate/client";
+import { PrismaClient } from "@/lib/prisma/generate/client";
 
-let prisma: PrismaClient | undefined;
-
-// * Singleton Pattern.
-function getPrismaClient() {
-  if (!prisma) {
-    prisma = new PrismaClient();
-  }
-  return prisma;
+declare global {
+  var prisma: PrismaClient | undefined;
 }
 
-export default getPrismaClient();
+let prisma: PrismaClient;
+
+if (process.env.NODE_ENV === "production") {
+  prisma = new PrismaClient();
+} else {
+  if (!globalThis.prisma) {
+    globalThis.prisma = new PrismaClient();
+  }
+  prisma = globalThis.prisma;
+}
+
+export default prisma;
