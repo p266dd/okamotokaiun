@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { decrypt } from "@/lib/jwt";
 
-const publicRoutes = ["/auth/login", "/auth/embark", "/auth/recover"];
+const publicRoutes = ["/auth/login", "/auth/embark", "/auth/recover", "/auth/reset"];
 
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;

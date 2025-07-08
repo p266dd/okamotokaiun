@@ -62,7 +62,7 @@ export default function LoginForm() {
             <div className="flex items-center">
               <Label htmlFor="password">パスワード</Label>
               <Link
-                href="/login?action=recover"
+                href="/auth/recover"
                 className="ml-auto text-sm underline-offset-2 hover:underline text-slate-400"
               >
                 <span className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export default function LoginForm() {
           >
             ログイン {isPending && <Loader className="animate-spin" />}
           </Button>
-          <Link className="text-primary" href="/login?action=embark" prefetch={true}>
+          <Link className="text-primary" href="/auth/embark" prefetch={true}>
             <span className="flex items-center gap-2">
               <LoadingIndicator />
               乗降船登録はこちら
