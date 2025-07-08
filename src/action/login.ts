@@ -2,8 +2,9 @@
 
 import { z } from "zod/v4";
 import prisma from "@/lib/prisma";
+import { redirect } from "next/navigation";
 import { compareSync } from "bcryptjs";
-import { createSession } from "@/lib/session";
+import { createSession, deleteSession } from "@/lib/session";
 
 import { User } from "@/lib/validation";
 
@@ -73,3 +74,10 @@ export const LoginAction = async function (
     return { error: "ログイン中に予期しないエラーが発生しました。" };
   }
 };
+
+// Logout action.
+export async function LogoutAction() {
+  "use server";
+  await deleteSession();
+  redirect("/login");
+}
