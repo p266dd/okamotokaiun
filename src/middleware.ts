@@ -10,7 +10,7 @@ export default async function middleware(req: NextRequest) {
 
   // Get session
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session")?.value;
+  const sessionCookie = cookieStore.get("okamoto_session")?.value;
   const session = sessionCookie ? await decrypt(sessionCookie) : null;
 
   // Private and no session.

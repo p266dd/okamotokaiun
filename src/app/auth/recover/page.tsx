@@ -1,7 +1,4 @@
-import { z } from "zod/v4";
 import Image from "next/image";
-import { decrypt } from "@/lib/jwt";
-import { JWTPayload } from "jose";
 import RecoverForm from "@/components/auth/recover-form";
 
 import CompanyLogo from "@/assets/company_logo.png";

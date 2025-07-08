@@ -19,7 +19,7 @@ export async function createSession({
     return null;
   }
 
-  cookieStore.set("session", session, {
+  cookieStore.set("okamoto_session", session, {
     httpOnly: true,
     secure: true,
     expires: expiration,
@@ -34,7 +34,7 @@ export async function createSession({
 // Returns decrypted session data from cookie.
 export async function getSession(): Promise<JWTPayload | null> {
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session")?.value;
+  const sessionCookie = cookieStore.get("okamoto_session")?.value;
 
   if (!sessionCookie) {
     return null;
@@ -47,5 +47,5 @@ export async function getSession(): Promise<JWTPayload | null> {
 // Delete session cookie.
 export async function deleteSession(): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.delete("session");
+  cookieStore.delete("okamoto_session");
 }

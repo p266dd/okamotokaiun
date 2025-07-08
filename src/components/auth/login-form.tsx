@@ -28,7 +28,7 @@ export default function LoginForm() {
       toast.error(state.error);
       return;
     }
-    if (state && "successs" in state) {
+    if (state && "success" in state) {
       router.push("/");
     }
   }, [state]);
