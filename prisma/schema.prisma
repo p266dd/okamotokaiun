@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/lib/prisma/generate"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String?
+  email     String   @unique
+  password  String
+  token     String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user")
+}
+
+model Staff {
+  id         String  @id @default(uuid())
+  firstName  String
+  lastName   String
+  email      String? @unique
+  phone      String?
+  department String
+  role       String
+  salary     Int
+  code       String  @unique
+  status     Boolean @default(false)
+  isActive   Boolean @default(true)
+
+  ship   Ship   @relation(fields: [shipId], references: [id])
+  shipId String
+
+  schedule Schedule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("staff")
+}
+
+model Ship {
+  id   String @id @default(cuid())
+  name String @unique
+
+  staff    Staff[]
+  schedule Schedule[]
+
+  @@map("ship")
+}
+
+model Schedule {
+  id        String    @id @default(cuid())
+  embark    DateTime
+  desembark DateTime?
+
+  ship   Ship   @relation(fields: [shipId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  shipId String
+
+  staff   Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  staffId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("schedule")
+}
