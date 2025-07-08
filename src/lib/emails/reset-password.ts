@@ -68,11 +68,11 @@ export async function resetPassword({
             </p>
           </div>
           <div>
-            <a href="${process.env.NEXT_PUBLIC_BASE_URL}/login?action=reset&token=${token}" target="_blank" class="button">Reset Password</a>
+            <a href="${process.env.NEXT_PUBLIC_BASE_URL}/auth/reset?token=${token}" target="_blank" class="button">Reset Password</a>
           </div>
           <div>
             <p class="token">
-              ${process.env.NEXT_PUBLIC_BASE_URL}/login?action=reset&token=${token}
+              ${process.env.NEXT_PUBLIC_BASE_URL}/auth/reset?token=${token}
             </p>
           </div>
           <p>If you didn't request this, you can safely ignore this email.</p>
