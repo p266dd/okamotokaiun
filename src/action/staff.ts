@@ -5,7 +5,16 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@/lib/prisma/generate";
 export type TStaffWithSchedule = Prisma.StaffGetPayload<{
   include: {
-    schedule: true;
+    schedule: {
+      include: {
+        staff: {
+          omit: {
+            status: true;
+            code: true;
+          };
+        };
+      };
+    };
   };
 }>;
 

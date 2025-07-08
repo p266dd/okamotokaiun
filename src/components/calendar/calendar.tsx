@@ -63,6 +63,7 @@ export default function Calendar() {
   const [isLoadingPrev, setIsLoadingPrev] = useState<boolean>(false);
   const [currentZoom, setCurrentZoom] = useState<number>(1);
   const [recenter, setRecenter] = useState<number>(0);
+  const [refresh, setRefresh] = useState<number>(0);
 
   // Filter by ship.
   const [selectedShipId, setSelectedShipId] = useState<string | undefined>(undefined);
@@ -98,7 +99,7 @@ export default function Calendar() {
 
     setRecenter(1);
     document.documentElement.style.zoom = String(currentZoom);
-  }, [recenter, currentZoom]);
+  }, [recenter, currentZoom, refresh]);
 
   const firstDay = useMemo(() => displayedDays[0], [displayedDays]);
   const lastDay = useMemo(() => displayedDays[displayedDays.length - 1], [displayedDays]);
@@ -113,7 +114,7 @@ export default function Calendar() {
 
   // Fetch all users and their schedule given the date range.
   const { data: staffList, isLoading: loadingStaffList } = useSWR(
-    { key: "fetchStaffWithSchedule", firstDay, lastDay },
+    { key: "fetchStaffWithSchedule", firstDay, lastDay, refresh },
     () => fetchStaffWithSchedule(firstDay, lastDay)
   );
 
@@ -444,6 +445,7 @@ export default function Calendar() {
                                   cellContent={cellContent}
                                   schedule={schedule}
                                   shipList={shipList}
+                                  setRefresh={setRefresh}
                                 />
                               </TableCell>
                             );

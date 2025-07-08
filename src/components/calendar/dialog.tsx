@@ -1,14 +1,15 @@
 "use client";
 
 import { z } from "zod/v4";
-import { mutate } from "swr";
-import { ReactElement, useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+
+import { updateScheduleData } from "@/action/update-schedule";
 
 // Shadcn
 import {
@@ -38,29 +39,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableHead,
-  TableHeader,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableRow,
-} from "@/components/ui/table";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, PlusCircleIcon, ShipIcon, XCircleIcon } from "lucide-react";
+import { CalendarIcon, ShipIcon } from "lucide-react";
 
 // Type
-import { Schedule } from "@/lib/validation";
-type TPartialSchedule = {
-  id: string;
-  shipId: string;
-  staffId: string;
-  embark?: Date | null | undefined;
-  desembark?: Date | null | undefined;
-};
+import { Prisma } from "@/lib/prisma/generate";
+type TPartialSchedule = Prisma.ScheduleGetPayload<{
+  include: {
+    staff: {
+      omit: {
+        status: true;
+        code: true;
+      };
+    };
+  };
+}>;
 
 // Schema
 const formSchema = z.object({
@@ -74,12 +69,15 @@ export default function CalendarDialog({
   cellContent,
   schedule,
   shipList,
+  setRefresh,
 }: {
   cellContent: React.ReactElement;
   schedule: TPartialSchedule;
   shipList: { id: string; name: string }[] | undefined | null;
+  setRefresh: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const [edit, setEdit] = useState(false);
+  console.log(schedule);
 
   // Activate the save button.
   const handleChange = useCallback(() => {
@@ -100,22 +98,24 @@ export default function CalendarDialog({
     formState: { isDirty },
   } = form;
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // updateScheduleData({
-    //   shipID: values.shipID,
-    //   embark: values.embark,
-    //   desembark: values.desembark,
-    //   scheduleId: values.scheduleId,
-    // })
-    //   .then(() => {
-    //     toast.success("Changes have been saved.");
-    //     setEdit(false);
-    //     onScheduleUpdate(); // Call the callback to trigger refresh in parent.
-    //   })
-    //   .catch((error) => {
-    //     toast.error(error.message);
-    //   });
-    // return;
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const formData = {
+      shipID: values.shipID,
+      embark: values.embark,
+      desembark: values.desembark,
+      scheduleId: values.scheduleId,
+    };
+
+    const updatedSchedule = await updateScheduleData(formData);
+
+    if (updatedSchedule.error) {
+      toast.error(updatedSchedule.error);
+      return;
+    }
+
+    toast.success("Changes have been saved.");
+    setRefresh((prev) => prev + 1);
+    setEdit(false);
   }
 
   useEffect(() => {
@@ -146,13 +146,9 @@ export default function CalendarDialog({
             />
             <div>
               <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-                {/* {schedule.staff.lastName + " " + schedule.staff.firstName} */}
-                Staff Name
+                {schedule.staff?.lastName + " " + schedule.staff?.firstName}
               </h3>
-              <div className="text-sm text-gray-400 mb-5">
-                {/* {schedule.staff?.role} */}
-                Staff Role
-              </div>
+              <div className="text-sm text-gray-400 mb-5">{schedule.staff?.role}</div>
               <div className="flex flex-col gap-3 mb-4">
                 <FormField
                   control={form.control}
@@ -269,7 +265,8 @@ export default function CalendarDialog({
                   />
                 </div>
               </div>
-              {/* <div className="mb-8 max-h-[300px] overflow-y-auto">
+              {/* // Keeping this section in case it's needed.
+              <div className="mb-8 max-h-[300px] overflow-y-auto">
                 <div className="flex items-center gap-6 mb-4">
                   <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
                     乗船中の休暇登録
