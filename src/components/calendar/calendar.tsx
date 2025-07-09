@@ -156,7 +156,9 @@ export default function Calendar() {
                       ? "n1"
                       : ship.name === "JFE N3 / 第三清丸"
                       ? "n3"
-                      : "n"
+                      : ship.name === "扇鳳丸"
+                      ? "n"
+                      : "outline"
                   }
                   onClick={() => setSelectedShipId(ship.id)}
                 >

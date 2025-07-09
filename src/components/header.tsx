@@ -70,7 +70,9 @@ export default async function Header() {
                 <NavigationMenuItem>
                   <NavigationMenuLink asChild>
                     <form action={LogoutAction}>
-                      <button type="submit">ログアウト</button>
+                      <button type="submit" className="cursor-pointer">
+                        ログアウト
+                      </button>
                     </form>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
