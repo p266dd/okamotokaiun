@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import useSWR, { mutate } from "swr";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import AddShip from "./add-ship";
 
 import { updateStaff, createStaff } from "@/action/staff";
 import { fetchShips } from "@/action/ships";
@@ -193,25 +194,28 @@ export default function StaffForm({
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormLabel>船舶</FormLabel>
-                <Select onValueChange={field.onChange} required {...field}>
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="船舶を選択" {...field} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {loadingShips ? (
-                      <SelectItem value="loading">Loading...</SelectItem>
-                    ) : (
-                      shipList &&
-                      shipList.map((ship) => (
-                        <SelectItem value={ship.id} key={ship.id}>
-                          {ship.name}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
+                <div className="flex items-center gap-1">
+                  <Select onValueChange={field.onChange} required {...field}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="船舶を選択" {...field} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {loadingShips ? (
+                        <SelectItem value="loading">Loading...</SelectItem>
+                      ) : (
+                        shipList &&
+                        shipList.map((ship) => (
+                          <SelectItem value={ship.id} key={ship.id}>
+                            {ship.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <AddShip />
+                </div>
                 <FormMessage className="text-xs" />
               </FormItem>
             )}
@@ -252,11 +256,11 @@ export default function StaffForm({
             name="role"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel>Role</FormLabel>
+                <FormLabel>階級</FormLabel>
                 <Select onValueChange={field.onChange} required {...field}>
                   <FormControl>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Role" {...field} />
+                      <SelectValue placeholder="階級を選択" {...field} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -280,7 +284,7 @@ export default function StaffForm({
                         </>
                       )
                     ) : (
-                      <span>Select a Department</span>
+                      <span>階級を選択</span>
                     )}
                   </SelectContent>
                 </Select>
@@ -289,7 +293,8 @@ export default function StaffForm({
             )}
           />
 
-          <FormField
+          <Input type="hidden" value={0} readOnly required />
+          {/* <FormField
             control={form.control}
             name="salary"
             render={({ field }) => (
@@ -301,7 +306,7 @@ export default function StaffForm({
                 <FormMessage className="text-xs" />
               </FormItem>
             )}
-          />
+          /> */}
         </div>
 
         {errorMessage && (

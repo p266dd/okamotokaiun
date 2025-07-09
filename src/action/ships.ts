@@ -4,11 +4,75 @@ import prisma from "@/lib/prisma";
 
 export async function fetchShips() {
   "use server";
-  const result = await prisma.ship.findMany();
+  const result = await prisma.ship.findMany({
+    orderBy: {
+      name: "asc",
+    },
+  });
 
   if (!result) {
     return null;
   }
 
   return result;
+}
+
+export async function updateShip(ship: { id: string; name: string }) {
+  try {
+    const result = await prisma.ship.update({
+      data: {
+        name: ship.name,
+      },
+      where: {
+        id: ship.id,
+      },
+    });
+
+    if (!result) {
+      return null;
+    }
+
+    return result;
+  } catch (error) {
+    console.log("Error updating ship.");
+    return null;
+  }
+}
+
+export async function createShip(ship: { name: string }) {
+  try {
+    const result = await prisma.ship.create({
+      data: {
+        name: ship.name,
+      },
+    });
+
+    if (!result) {
+      return null;
+    }
+
+    return result;
+  } catch (error) {
+    console.log("Error creating ship.");
+    return null;
+  }
+}
+
+export async function deleteShip(shipId: string) {
+  try {
+    const result = await prisma.ship.delete({
+      where: {
+        id: shipId,
+      },
+    });
+
+    if (!result) {
+      return null;
+    }
+
+    return result;
+  } catch (error) {
+    console.log("Error deleting ship.");
+    return null;
+  }
 }
