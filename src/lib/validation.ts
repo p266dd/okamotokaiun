@@ -10,7 +10,7 @@ export const UserSchema = z.object({
 });
 export type User = z.infer<typeof UserSchema>;
 
-const StaffSchema = z.object({
+export const StaffSchema = z.object({
   id: z.uuid(),
   firstName: z.string().trim(),
   lastName: z.string().trim(),
@@ -27,14 +27,14 @@ const StaffSchema = z.object({
 });
 export type Staff = z.infer<typeof StaffSchema>;
 
-const ShipSchema = z.object({
+export const ShipSchema = z.object({
   id: z.uuid(),
   name: z.string().trim(),
   updatedAt: z.iso.date().optional(),
 });
 export type Ship = z.infer<typeof ShipSchema>;
 
-const ScheduleSchema = z.object({
+export const ScheduleSchema = z.object({
   id: z.uuid(),
   embark: z.date().optional(),
   desembark: z.date().optional(),

@@ -106,7 +106,7 @@ export default function EmbarkForm() {
                           <p className="mb-2">続行するには船を選択してください。</p>
                           <Select
                             name="ship"
-                            defaultValue={staff?.ship?.id}
+                            defaultValue={staff?.ship?.id || ship || ""}
                             onValueChange={(value) => setShip(value)}
                           >
                             <SelectTrigger className="w-full">

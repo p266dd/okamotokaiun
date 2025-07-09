@@ -33,11 +33,6 @@ import { Staff } from "@/lib/prisma/generate";
 import { Schedule } from "@/lib/prisma/generate";
 import { Button } from "@/components/ui/button";
 
-type Ships = {
-  id: string;
-  name: string;
-};
-
 type PayrollForm = {
   shipID: string;
   start: Date | null;

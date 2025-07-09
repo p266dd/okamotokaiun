@@ -266,7 +266,7 @@ export default function StaffForm({
                   <SelectContent>
                     {department ? (
                       department === "司厨部" ? (
-                        <SelectItem value="一等機関士">一等機関士"</SelectItem>
+                        <SelectItem value="一等機関士">一等機関士</SelectItem>
                       ) : department === "甲板部" ? (
                         <>
                           <SelectItem value="船長">船長</SelectItem>
@@ -279,8 +279,8 @@ export default function StaffForm({
                         <>
                           <SelectItem value="機関長">機関長</SelectItem>
                           <SelectItem value="二等機関士">二等機関士</SelectItem>
-                          <SelectItem value="三等機関士">三等機関士"</SelectItem>
-                          <SelectItem value="機関部員">機関部員"</SelectItem>
+                          <SelectItem value="三等機関士">三等機関士</SelectItem>
+                          <SelectItem value="機関部員">機関部員</SelectItem>
                         </>
                       )
                     ) : (

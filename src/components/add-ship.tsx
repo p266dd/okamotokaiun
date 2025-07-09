@@ -164,7 +164,7 @@ export default function AddShip() {
             <div className="flex flex-col gap-1">
               {ships &&
                 ships.map((ship) => (
-                  <div className="flex items-center justify-between">
+                  <div key={ship.id} className="flex items-center justify-between">
                     <div>{ship.name}</div>
                     <div className="flex items-center gap-2">
                       <EditFormInput ship={ship} />

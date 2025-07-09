@@ -3,7 +3,6 @@
 import { z } from "zod/v4";
 import { hashSync } from "bcryptjs";
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 import { createSession } from "@/lib/session";
 import { User } from "@/lib/validation";
 

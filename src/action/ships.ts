@@ -33,7 +33,7 @@ export async function updateShip(ship: { id: string; name: string }) {
     }
 
     return result;
-  } catch (error) {
+  } catch (_e) {
     console.log("Error updating ship.");
     return null;
   }
@@ -52,7 +52,7 @@ export async function createShip(ship: { name: string }) {
     }
 
     return result;
-  } catch (error) {
+  } catch (_e) {
     console.log("Error creating ship.");
     return null;
   }
@@ -71,7 +71,7 @@ export async function deleteShip(shipId: string) {
     }
 
     return result;
-  } catch (error) {
+  } catch (_e) {
     console.log("Error deleting ship.");
     return null;
   }

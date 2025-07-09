@@ -23,15 +23,13 @@ export default function LoginForm() {
     error: null,
   });
 
-  useEffect(() => {
-    if (state && state.error !== null && typeof state.error === "string") {
-      toast.error(state.error);
-      return;
-    }
-    if (state && "success" in state) {
-      router.push("/");
-    }
-  }, [state]);
+  if (state && state.error !== null && typeof state.error === "string") {
+    toast.error(state.error);
+    return;
+  }
+  if (state && "success" in state) {
+    router.push("/");
+  }
 
   return (
     <>

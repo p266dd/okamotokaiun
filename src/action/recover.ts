@@ -39,7 +39,6 @@ export const RecoverAction = async function (
 
   // Safe data.
   const { email } = validateSchema.data;
-  revalidatePath;
   try {
     // Find user by its email.
     const result = await prisma.user.findUnique({

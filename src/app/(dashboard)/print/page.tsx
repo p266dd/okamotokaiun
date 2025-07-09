@@ -38,7 +38,7 @@ import {
 import DatePicker from "@/components/date-picker";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDownIcon, LoaderCircleIcon, PrinterIcon } from "lucide-react";
+import { LoaderCircleIcon, PrinterIcon } from "lucide-react";
 import CalendarDialog from "@/components/calendar/dialog";
 
 export default function PrintCalendarPage() {
@@ -65,11 +65,8 @@ export default function PrintCalendarPage() {
     _setDisplayedDays(eachDayOfInterval({ start: startDate, end: endDate }));
   }, [selectedDate]);
 
-  const firstDay = useMemo(() => displayedDays[0], [displayedDays, selectedDate]);
-  const lastDay = useMemo(
-    () => displayedDays[displayedDays.length - 1],
-    [displayedDays, selectedDate]
-  );
+  const firstDay = useMemo(() => displayedDays[0], [displayedDays]);
+  const lastDay = useMemo(() => displayedDays[displayedDays.length - 1], [displayedDays]);
 
   // Fetch all users and their schedule given the date range.
   const { data: staffList, isLoading: loadingStaffList } = useSWR(
@@ -82,7 +79,7 @@ export default function PrintCalendarPage() {
   );
 
   // Fetch available ships.
-  const { data: shipList, isLoading: loadingShips } = useSWR("fetchShips", fetchShips);
+  const { data: shipList } = useSWR("fetchShips", fetchShips);
 
   if (loadingStaffList === true || !staffList) {
     return (
@@ -201,7 +198,7 @@ export default function PrintCalendarPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {displayedDays.map((day, i) => {
+                    {displayedDays.map((day) => {
                       let customStyle: string = "";
                       if (isSunday(day)) {
                         customStyle = "bg-gray-200";
