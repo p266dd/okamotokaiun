@@ -23,6 +23,7 @@ import { ja } from "date-fns/locale";
 // Icons
 import {
   ArrowDownIcon,
+  ArrowDownLeftIcon,
   ChevronLeft,
   ChevronRight,
   Loader,
@@ -69,7 +70,7 @@ export default function Calendar() {
   const [selectedShipId, setSelectedShipId] = useState<string | undefined>(undefined);
 
   const [displayedDays, setDisplayedDays] = useState<Date[]>(() => {
-    const startDate = subDays(startOfDay(today), 40);
+    const startDate = subDays(startOfDay(today), 120);
     const endDate = addDays(startOfDay(today), 20);
     return eachDayOfInterval({ start: startDate, end: endDate });
   });
@@ -97,7 +98,6 @@ export default function Calendar() {
       }
     }
 
-    setRecenter(1);
     document.documentElement.style.zoom = String(currentZoom);
   }, [recenter, currentZoom, refresh]);
 
@@ -121,10 +121,17 @@ export default function Calendar() {
   // Fetch available ships.
   const { data: shipList, isLoading: loadingShips } = useSWR("fetchShips", fetchShips);
 
-  if (!staffList) return null;
+  if (loadingStaffList === true || !staffList) {
+    return (
+      <div className="flex tems-center justify-center gap-3">
+        <LoaderCircleIcon className="animate-spin" />
+        Loading...
+      </div>
+    );
+  }
 
   // Sort the fetched data by dept, role and shipId.
-  const sortedStaff = sortStaff(staffList, selectedShipId);
+  const sortedStaff = sortStaff(staffList, selectedShipId, shipList ? shipList : []);
 
   return (
     <>
@@ -211,14 +218,20 @@ export default function Calendar() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedStaff.map((staff) => {
-                // Return the Department.
-                if ("type" in staff && staff.type === "Department") {
+              {sortedStaff.map((staff, i) => {
+                if ("type" in staff && staff.type === "Ship") {
+                  // Return the Ship Name.
                   return (
-                    <TableRow
-                      key={staff.name.toLocaleLowerCase()}
-                      className="h-4 bg-slate-200/70"
-                    >
+                    <TableRow key={staff.name.toLocaleLowerCase()} className="h-14">
+                      <TableCell className="pl-2">
+                        <span className="">{staff.name}</span>
+                      </TableCell>
+                    </TableRow>
+                  );
+                } else if ("type" in staff && staff.type === "Department") {
+                  // Return the Department.
+                  return (
+                    <TableRow key={i} className="h-6 bg-slate-200/70">
                       <TableCell className="text-slate-700 pl-2 py-0.5 text-xs">
                         <span className="">{staff.name}</span>
                       </TableCell>
@@ -241,7 +254,7 @@ export default function Calendar() {
                 }
                 // Return the staff name.
                 return (
-                  <TableRow key={staff.id} className="hover:bg-gray-100 h-9">
+                  <TableRow key={staff.id} className="hover:bg-gray-100 h-10">
                     <TableCell className="bg-blue-100 pr-4 sm:pr-12">{`${staff.lastName} ${staff.firstName}`}</TableCell>
                   </TableRow>
                 );
@@ -313,8 +326,9 @@ export default function Calendar() {
                           <div
                             className={`absolute -top-8 ${
                               isSameDay(today, day) ? "pl-11" : "pl-3"
-                            } left-0 text-lg text-black/50 border-l-4`}
+                            } left-0 text-lg text-black/50`}
                           >
+                            <ArrowDownLeftIcon className="size-4 inline mr-3" />
                             {format(day, "MMMM yyyy")}
                           </div>
                         ) : null}
@@ -331,16 +345,21 @@ export default function Calendar() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedStaff.map((staff) => {
-                  if ("type" in staff && staff.type === "Department") {
+                {sortedStaff.map((staff, i) => {
+                  if ("type" in staff && staff.type === "Ship") {
                     return (
-                      <TableRow
-                        key={staff.name.toLocaleLowerCase()}
-                        className="h-4 bg-slate-200/70"
-                      >
+                      <TableRow key={staff.name.toLocaleLowerCase()} className="h-14">
+                        <TableCell colSpan={displayedDays.length} className="pl-2">
+                          <span className="text-transparent">{staff.name}</span>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  } else if ("type" in staff && staff.type === "Department") {
+                    return (
+                      <TableRow key={i} className="h-6 bg-slate-200/70">
                         <TableCell
                           colSpan={displayedDays.length}
-                          className="p-0 border-x border-slate-200"
+                          className="text-slate-700 pl-2 py-0.5 text-xs"
                         >
                           <span className="text-transparent">{staff.name}</span>
                         </TableCell>
@@ -351,7 +370,7 @@ export default function Calendar() {
                     return null;
                   } else {
                     return (
-                      <TableRow key={staff.id} className="hover:bg-gray-100 h-9">
+                      <TableRow key={staff.id} className="hover:bg-gray-100 h-10">
                         {displayedDays.map((day, i) => {
                           // Find relevant schedule.
                           const currentDay = startOfDay(day);

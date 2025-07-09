@@ -77,7 +77,6 @@ export default function CalendarDialog({
   setRefresh: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const [edit, setEdit] = useState(false);
-  console.log(schedule);
 
   // Activate the save button.
   const handleChange = useCallback(() => {

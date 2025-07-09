@@ -6,7 +6,8 @@ export type TDepartment = "甲板部" | "機関部" | "司厨部";
 export type TSortedStaff =
   | TStaffWithSchedule
   | { type: "Department"; name: TDepartment }
-  | { type: "Role"; name: string };
+  | { type: "Role"; name: string }
+  | { type: "Ship"; name: string };
 
 // Sorting order.
 const DECK_ORDER = ["船長", "一等航海士", "二等航海士", "三等航海士", "甲板部員"];
@@ -22,29 +23,35 @@ const ROLE_ORDER: Record<TDepartment, string[]> = {
 // Sort Function
 export function sortStaff(
   staffData: TStaffWithSchedule[],
-  shipId?: string
+  shipId?: string,
+  shipList: { id: string; name: string }[] = []
 ): TSortedStaff[] {
   const sortedStaff: TSortedStaff[] = [];
 
-  // Sort by Depatment and Role.
-  for (const department of DEPARTMENT_ORDER) {
-    const staffInDept = staffData.filter(
-      (s) =>
-        s.department === department && (shipId !== undefined ? s.shipId === shipId : true)
+  for (const ship of shipList) {
+    const staffInShip = staffData.filter(
+      (s) => s.shipId === ship.id && (shipId !== undefined ? s.shipId === shipId : true)
     );
+    if (staffInShip.length === 0) continue;
 
-    if (staffInDept.length === 0) continue;
+    sortedStaff.push({ type: "Ship", name: ship.name });
 
-    sortedStaff.push({ type: "Department", name: department as TDepartment });
+    for (const department of DEPARTMENT_ORDER) {
+      const staffInDept = staffInShip.filter((s) => s.department === department);
 
-    const roleOrder = ROLE_ORDER[department as TDepartment];
+      if (staffInDept.length === 0) continue;
 
-    for (const role of roleOrder) {
-      const staffInRole = staffInDept.filter((s) => s.role === role);
-      if (staffInRole.length === 0) continue;
+      sortedStaff.push({ type: "Department", name: department as TDepartment });
 
-      sortedStaff.push({ type: "Role", name: role });
-      sortedStaff.push(...staffInRole);
+      const roleOrder = ROLE_ORDER[department as TDepartment];
+
+      for (const role of roleOrder) {
+        const staffInRole = staffInDept.filter((s) => s.role === role);
+        if (staffInRole.length === 0) continue;
+
+        sortedStaff.push({ type: "Role", name: role });
+        sortedStaff.push(...staffInRole);
+      }
     }
   }
 
@@ -64,7 +71,7 @@ export function loadPreviousDays(
 
   const firstDay = displayedDays[0];
   const endDate = subDays(firstDay, 1);
-  const startDate = subDays(endDate, 15 - 1);
+  const startDate = subDays(endDate, 100 - 1);
 
   const newDays = eachDayOfInterval({ start: startDate, end: endDate });
   setDisplayedDays((prevDays) => [...newDays, ...prevDays]);
@@ -83,7 +90,7 @@ export function loadNextDays(
 
   const lastDay = displayedDays[displayedDays.length - 1];
   const startDate = addDays(lastDay, 1);
-  const endDate = addDays(startDate, 15 - 1);
+  const endDate = addDays(startDate, 100 - 1);
 
   const newDays = eachDayOfInterval({ start: startDate, end: endDate });
   setDisplayedDays((prevDays) => [...prevDays, ...newDays]);
