@@ -47,7 +47,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 // Actions
 import { sortStaff, loadPreviousDays, loadNextDays } from "@/lib/calendar-functions";
-import { fetchStaffWithSchedule } from "@/action/staff";
+import { fetchStaffWithSchedule, TStaffWithSchedule } from "@/action/staff";
 import { fetchShips } from "@/action/ships";
 
 export default function Calendar() {
@@ -113,22 +113,30 @@ export default function Calendar() {
   }
 
   // Fetch all users and their schedule given the date range.
-  const { data: staffList, isLoading: loadingStaffList } = useSWR(
+  const [prevData, setPrevData] = useState<TStaffWithSchedule[] | null>(null);
+  const { data, isLoading } = useSWR(
     { key: "fetchStaffWithSchedule", firstDay, lastDay, refresh },
-    () => fetchStaffWithSchedule(firstDay, lastDay)
+    () => fetchStaffWithSchedule(firstDay, lastDay),
+    {
+      onSuccess: (newData) => {
+        setPrevData(newData);
+      },
+    }
   );
+
+  const staffList = (data as TStaffWithSchedule[]) ?? (prevData as TStaffWithSchedule[]);
 
   // Fetch available ships.
   const { data: shipList, isLoading: loadingShips } = useSWR("fetchShips", fetchShips);
 
-  if (loadingStaffList === true || !staffList) {
-    return (
-      <div className="flex tems-center justify-center gap-3">
-        <LoaderCircleIcon className="animate-spin" />
-        Loading...
-      </div>
-    );
-  }
+  // if (loadingStaffList === true || !staffList) {
+  //   return (
+  //     <div className="flex tems-center justify-center gap-3">
+  //       <LoaderCircleIcon className="animate-spin" />
+  //       Loading...
+  //     </div>
+  //   );
+  // }
 
   // Sort the fetched data by dept, role and shipId.
   const sortedStaff = sortStaff(staffList, selectedShipId, shipList ? shipList : []);
@@ -202,8 +210,8 @@ export default function Calendar() {
       </div>
 
       <div className="relative flex">
-        {loadingStaffList && (
-          <div className="absolute h-full inset-0 -top-2 z-50 bg-white/80 border-4 flex justify-center my-8">
+        {isLoading && (
+          <div className="absolute h-full inset-0 -top-2 z-50 bg-white/80 flex justify-center my-8">
             <span className="flex items-center gap-2">
               <LoaderCircleIcon className="animate-spin" /> Loading...
             </span>
@@ -275,7 +283,7 @@ export default function Calendar() {
                 setIsLoadingPrev
               )
             }
-            className="absolute top-1/2 left-2 -translate-y-1/3 transition-all w-10 h-10 hover:h-1/2 bg-slate-600/30 hover:bg-slate-600 z-50 rounded-full flex items-center justify-center cursor-pointer print:hidden"
+            className="absolute top-1/2 left-2 -translate-y-1/3 transition-all w-10 h-10 hover:h-20 bg-slate-600/30 hover:bg-slate-600 z-50 rounded-full flex items-center justify-center cursor-pointer print:hidden"
           >
             {isLoadingPrev ? (
               <Loader className="stroke-white animate-spin" />
@@ -292,7 +300,7 @@ export default function Calendar() {
                 setIsLoadingNext
               )
             }
-            className="absolute top-1/2 right-2 -translate-y-1/3 transition-all w-10 h-10 hover:h-1/2 bg-slate-600/30 hover:bg-slate-600 z-50 rounded-full flex items-center justify-center cursor-pointer print:hidden"
+            className="absolute top-1/2 right-2 -translate-y-1/3 transition-all w-10 h-10 hover:h-20 bg-slate-600/30 hover:bg-slate-600 z-50 rounded-full flex items-center justify-center cursor-pointer print:hidden"
           >
             {isLoadingNext ? (
               <Loader className="stroke-white animate-spin" />
