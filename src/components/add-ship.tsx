@@ -165,8 +165,8 @@ export default function AddShip() {
               {ships &&
                 ships.map((ship) => (
                   <div key={ship.id} className="flex items-center justify-between">
-                    <div>{ship.name}</div>
-                    <div className="flex items-center gap-2">
+                    <div className="text-sm">{ship.name}</div>
+                    <div className="flex items-center">
                       <EditFormInput ship={ship} />
                       <Button
                         type="button"
