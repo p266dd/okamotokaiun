@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useActionState } from "react";
 import { LoadingIndicator } from "@/components/loading-indicator";
 import { LoginAction } from "@/action/login";
 
