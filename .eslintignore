@@ -1,1 +1,2 @@
-/src/lib/prisma/generate/
+# .eslintignore
+src/lib/prisma/generate/
