@@ -16,7 +16,7 @@ function formatDate(date: Date | undefined) {
   if (!date) {
     return "";
   }
-  return format(date, "MMM do", { locale: ja });
+  return format(date, "yyyy MMM do", { locale: ja });
 }
 
 // Helper function to check validity.
