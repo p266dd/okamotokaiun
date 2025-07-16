@@ -144,13 +144,19 @@ export default function PrintCalendarPage() {
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="dateFrom">From</Label>
-            <DatePicker
-              id="dateFrom"
-              selected={selectedDate}
-              handleChange={(
-                date // date is Date | undefined
-              ) => setSelectedDate(date ? date : today)}
-            />
+            <div className="flex items-center gap-4">
+              <DatePicker
+                id="dateFrom"
+                selected={selectedDate}
+                handleChange={(
+                  date // date is Date | undefined
+                ) => setSelectedDate(date ? date : today)}
+              />
+              <div className="flex items-center gap-3">
+                <div>{format(firstDay, "yyyy MMMM do", { locale: ja })}から</div>
+                <div>{format(lastDay, "yyyy MMMM do", { locale: ja })}まで</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
