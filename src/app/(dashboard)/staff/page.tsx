@@ -80,7 +80,7 @@ export default function StaffPage() {
               <TableHead>社員番号</TableHead>
               <TableHead>船舶</TableHead>
               <TableHead>所属</TableHead>
-              <TableHead>日給</TableHead>
+              <TableHead>階級</TableHead>
               <TableHead className="text-right w-12"></TableHead>
             </TableRow>
           </TableHeader>
@@ -92,8 +92,8 @@ export default function StaffPage() {
                   <TableCell>{staff.phone}</TableCell>
                   <TableCell>{staff.code}</TableCell>
                   <TableCell>{staff?.ship?.name}</TableCell>
+                  <TableCell>{staff.department}</TableCell>
                   <TableCell>{staff.role}</TableCell>
-                  <TableCell>¥ {`${staff.salary}`}</TableCell>
                   <TableCell className="text-right w-12">
                     <DropdownMenu>
                       <DropdownMenuTrigger>

@@ -49,7 +49,7 @@ type StaffPayrollRow = Staff & {
   workedDays: number;
 };
 
-type SortKey = "name" | "role" | "workedDays" | "salary";
+type SortKey = "name" | "role" | "department" | "workedDays" | "salary";
 type SortOrder = "asc" | "desc";
 type SortConfig = {
   key: SortKey | null;
@@ -294,6 +294,17 @@ export default function PayrollPage() {
                 >
                   所属 <ArrowUpDownIcon className="h-3 w-3" />
                   <span className="text-sm text-blue-500">
+                    {getSortIndicator("department")}
+                  </span>
+                </button>
+              </TableHead>
+              <TableHead>
+                <button
+                  onClick={() => requestSort("role")}
+                  className="flex items-center gap-1 hover:text-primary"
+                >
+                  階級 <ArrowUpDownIcon className="h-3 w-3" />
+                  <span className="text-sm text-blue-500">
                     {getSortIndicator("role")}
                   </span>
                 </button>
@@ -320,6 +331,10 @@ export default function PayrollPage() {
                     {`${staffMember.lastName || ""} ${
                       staffMember.firstName || ""
                     }`.trim()}
+                  </TableCell>
+
+                  <TableCell className="capitalize">
+                    {staffMember.department || "N/A"}
                   </TableCell>
 
                   <TableCell className="capitalize">
