@@ -75,7 +75,7 @@ export default function StaffForm({
       phone: edit ? edit?.phone : "",
       role: edit ? edit?.role : "",
       department: edit ? edit?.department : "",
-      salary: edit ? String(edit?.salary) : "",
+      salary: "0",
       code: edit ? edit?.code : generateSixDigitNumber || "",
     },
   });
