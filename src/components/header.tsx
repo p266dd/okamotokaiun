@@ -62,7 +62,7 @@ export default async function Header() {
                     <Link href="/payroll">
                       <span className="flex items-center gap-1">
                         <LoadingIndicator />
-                        給与計算
+                        勤務日数
                       </span>
                     </Link>
                   </NavigationMenuLink>
@@ -102,7 +102,7 @@ export default async function Header() {
                     </li>
                     <li>
                       <Link href="/payroll">
-                        <Dot size={16} className="inline-block mr-2" /> 給与計算
+                        <Dot size={16} className="inline-block mr-2" /> 勤務日数
                       </Link>
                     </li>
                     <li className="py-9">
