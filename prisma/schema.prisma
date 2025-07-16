@@ -31,7 +31,7 @@ model Staff {
   phone      String?
   department String
   role       String
-  salary     Int
+  salary     Int     @default(0)
   code       String  @unique
   status     Boolean @default(false)
   isActive   Boolean @default(true)
