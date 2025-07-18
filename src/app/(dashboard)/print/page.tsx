@@ -2,8 +2,8 @@
 
 import useSWR from "swr";
 import { useState, useMemo, useEffect } from "react";
-import { fetchStaffWithSchedule } from "@/action/staff";
-import { sortStaff } from "@/lib/calendar-functions";
+import { getCalendarContent } from "@/action/get-calendar";
+import { sortSchedules, TSchedule } from "@/lib/calendar-functions";
 import { fetchShips } from "@/action/ships";
 
 import {
@@ -47,9 +47,6 @@ export default function PrintCalendarPage() {
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState<Date>(today);
 
-  // Fetch ships.
-  const { data: availableShips } = useSWR("fetchShips", fetchShips);
-
   // Filter by ship.
   const [selectedShipId, setSelectedShipId] = useState<string | undefined>(undefined);
 
@@ -68,20 +65,22 @@ export default function PrintCalendarPage() {
   const firstDay = useMemo(() => displayedDays[0], [displayedDays]);
   const lastDay = useMemo(() => displayedDays[displayedDays.length - 1], [displayedDays]);
 
+  // Fetch available ships.
+  const { data: availableShips } = useSWR("fetchShips", fetchShips);
+
   // Fetch all users and their schedule given the date range.
-  const { data: staffList, isLoading: loadingStaffList } = useSWR(
+  const [prevData, setPrevData] = useState<TSchedule[] | null>(null);
+  const { data, isLoading } = useSWR(
+    { key: "fetchStaffWithSchedule", firstDay, lastDay },
+    () => getCalendarContent({ firstDay, lastDay }),
     {
-      key: "fetchStaffWithSchedule",
-      firstDay: firstDay.toISOString(),
-      lastDay: lastDay.toISOString(),
-    },
-    () => fetchStaffWithSchedule(firstDay, lastDay)
+      onSuccess: (newData) => {
+        setPrevData(newData);
+      },
+    }
   );
 
-  // Fetch available ships.
-  const { data: shipList } = useSWR("fetchShips", fetchShips);
-
-  if (loadingStaffList === true || !staffList) {
+  if (isLoading === true || !data) {
     return (
       <div className="flex tems-center justify-center gap-3">
         <LoaderCircleIcon className="animate-spin" />
@@ -90,8 +89,10 @@ export default function PrintCalendarPage() {
     );
   }
 
+  const scheduleList = (data as TSchedule[]) ?? (prevData as TSchedule[]);
+
   // Sort the fetched data by dept, role and shipId.
-  const sortedStaff = sortStaff(staffList, selectedShipId, shipList ? shipList : []);
+  const sortedStaff = sortSchedules(availableShips || [], scheduleList);
 
   const printPage = () => {
     window.print();
@@ -172,27 +173,44 @@ export default function PrintCalendarPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedStaff.map((staff, i) => {
-                    if ("type" in staff && staff.type === "Ship") {
+                  {sortedStaff.map((schedule, i) => {
+                    if ("type" in schedule && schedule.type === "Ship") {
                       // Return the Ship Name.
                       return (
-                        <TableRow key={staff.name.toLocaleLowerCase()}>
-                          <TableCell className="text-xs">{staff.name}</TableCell>
+                        <TableRow key={i} className="h-14">
+                          <TableCell className="pl-2">
+                            <span className="">{schedule.name}</span>
+                          </TableCell>
                         </TableRow>
                       );
-                    } else if ("type" in staff && staff.type === "Department") {
+                    } else if ("type" in schedule && schedule.type === "Department") {
                       // Return the Department.
                       return (
-                        <TableRow key={i}>
-                          <TableCell className="text-xs">{staff.name}</TableCell>
+                        <TableRow key={i} className="h-6 bg-slate-200/70">
+                          <TableCell className="text-slate-700 pl-2 py-0.5 text-xs">
+                            <span className="">{schedule.name}</span>
+                          </TableCell>
                         </TableRow>
                       );
-                    } else if ("type" in staff && staff.type === "Role") {
+                    } else if ("type" in schedule && schedule.type === "Role") {
+                      // Return without displaying the Role.
                       return null;
+                      // return (
+                      //   <TableRow
+                      //     key={schedule.name.toLocaleLowerCase()}
+                      //     className="h-4 bg-slate-200/70"
+                      //   >
+                      //     <TableCell className="text-slate-700 pl-2 py-0.5 text-xs">
+                      //       {/* You can display item.roleName here if desired, or leave it for a visual break */}
+                      //       <span className="">{schedule.name}</span>
+                      //     </TableCell>
+                      //   </TableRow>
+                      // );
                     }
+                    // Return the staff name.
                     return (
-                      <TableRow key={staff.id}>
-                        <TableCell className="text-xs">{`${staff.lastName} ${staff.firstName}`}</TableCell>
+                      <TableRow key={i} className="hover:bg-gray-100 h-10">
+                        <TableCell className="bg-blue-100 pr-4 sm:pr-12">{`${schedule.staff.lastName} ${schedule.staff.firstName}`}</TableCell>
                       </TableRow>
                     );
                   })}
@@ -231,53 +249,54 @@ export default function PrintCalendarPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedStaff.map((staff, i) => {
-                    if ("type" in staff && staff.type === "Ship") {
+                  {sortedStaff.map((schedule, i) => {
+                    if ("type" in schedule && schedule.type === "Ship") {
                       return (
-                        <TableRow key={staff.name.toLocaleLowerCase()}>
-                          <TableCell colSpan={displayedDays.length} className="text-xs">
-                            <span className="text-transparent">{staff.name}</span>
+                        <TableRow key={i} className="h-14">
+                          <TableCell colSpan={displayedDays.length} className="pl-2">
+                            <span className="text-transparent">{schedule.name}</span>
                           </TableCell>
                         </TableRow>
                       );
-                    } else if ("type" in staff && staff.type === "Department") {
+                    } else if ("type" in schedule && schedule.type === "Department") {
                       return (
-                        <TableRow key={i} className="bg-gray-50">
+                        <TableRow key={i} className="h-6 bg-slate-200/70">
                           <TableCell
                             colSpan={displayedDays.length}
-                            className="text-xs text-transparent"
+                            className="text-slate-700 pl-2 py-0.5 text-xs"
                           >
-                            {staff.name}
+                            <span className="text-transparent">{schedule.name}</span>
                           </TableCell>
                         </TableRow>
                       );
-                    } else if ("type" in staff && staff.type === "Role") {
+                    } else if ("type" in schedule && schedule.type === "Role") {
                       // Don't show role row.
                       return null;
                     } else {
+                      // Schedule colors.
+                      const color =
+                        schedule.ship.name === "JFE N1 / 清丸"
+                          ? "bg-[#466dbe]"
+                          : schedule.ship.name === "JFE N3 / 第三清丸"
+                          ? "bg-[#e874cd]"
+                          : schedule.ship.name === "扇鳳丸"
+                          ? "bg-[#5ea64d]"
+                          : "bg-primary";
+
                       return (
-                        <TableRow key={staff.id}>
+                        <TableRow key={i} className="hover:bg-gray-100 h-10">
                           {displayedDays.map((day, i) => {
                             // Find relevant schedule.
                             const currentDay = startOfDay(day);
-                            const schedule = staff.schedule.find(
-                              (s) =>
-                                s.embark &&
-                                typeof s.shipId === "string" &&
-                                isWithinInterval(currentDay, {
-                                  start: startOfDay(s.embark),
-                                  end: s.desembark
-                                    ? startOfDay(s.desembark)
-                                    : startOfDay(new Date(Date.now())),
-                                })
-                            );
 
                             // Change the background if day is a weekend.
                             let customBackground: string = "";
                             if (isSunday(day)) {
-                              customBackground = "bg-gray-200";
+                              customBackground = "bg-red-100";
                             } else if (isSaturday(day)) {
-                              customBackground = "bg-gray-100";
+                              customBackground = "bg-blue-100";
+                            } else {
+                              customBackground = "bg-gray-50";
                             }
 
                             // Create what will be shown.
@@ -297,7 +316,9 @@ export default function PrintCalendarPage() {
                                 cellContent = (
                                   <div className="absolute inset-0 flex items-center justify-end">
                                     <span className="absolute z-20 flex items-center justify-center top-0 right-0 w-full h-full">
-                                      <span className="rounded-full w-4 h-4 bg-primary text-primary-foreground text-xs" />
+                                      <span
+                                        className={`rounded-full w-4 h-4 ${color} text-primary-foreground text-xs`}
+                                      />
                                     </span>
                                   </div>
                                 );
@@ -307,9 +328,11 @@ export default function PrintCalendarPage() {
                               ) {
                                 cellContent = (
                                   <div className="absolute inset-0 flex items-center justify-end">
-                                    <span className="block w-1/2 h-1 bg-primary"></span>
+                                    <span className={`block w-1/2 h-1 ${color}`}></span>
                                     <span className="absolute z-20 flex items-center justify-center top-0 right-0 w-full h-full">
-                                      <span className="rounded-full w-4 h-4 bg-primary text-primary-foreground text-xs" />
+                                      <span
+                                        className={`rounded-full w-4 h-4 ${color} text-primary-foreground text-xs`}
+                                      />
                                     </span>
                                   </div>
                                 );
@@ -320,29 +343,40 @@ export default function PrintCalendarPage() {
                               ) {
                                 cellContent = (
                                   <div className="absolute inset-0 flex items-center justify-start">
-                                    <span className="block w-1/2 h-1 bg-primary"></span>
+                                    <span className={`block w-1/2 h-1 ${color}`}></span>
                                     <span className="absolute z-20 flex items-center justify-center top-0 right-0 w-full h-full">
-                                      <span className="rounded-full w-4 h-4 bg-primary text-primary-foreground text-xs" />
+                                      <span
+                                        className={`rounded-full w-4 h-4 ${color} text-primary-foreground text-xs`}
+                                      />
                                     </span>
+                                  </div>
+                                );
+                              } else if (
+                                isWithinInterval(day, {
+                                  start: scheduleStart,
+                                  end: scheduleEnd,
+                                })
+                              ) {
+                                cellContent = (
+                                  <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className={`block w-full h-1 ${color}`}></span>
                                   </div>
                                 );
                               } else {
                                 cellContent = (
-                                  <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="block w-full h-1 bg-primary"></span>
-                                  </div>
+                                  <div className="absolute inset-0 flex items-center justify-center"></div>
                                 );
                               }
 
                               return (
                                 <TableCell
                                   key={`${day.toISOString()}`}
-                                  className={`relative text-center p-0 h-[30px] ${customBackground}`}
+                                  className={`relative text-center p-0 ${customBackground}`}
                                 >
                                   <CalendarDialog
                                     cellContent={cellContent}
                                     schedule={schedule}
-                                    shipList={shipList}
+                                    shipList={availableShips}
                                     setRefresh={() => null}
                                   />
                                 </TableCell>
@@ -350,7 +384,9 @@ export default function PrintCalendarPage() {
                             } else {
                               return (
                                 <TableCell
-                                  key={`${staff.id}-${day.toISOString()}-${i}-data`}
+                                  key={`${
+                                    schedule.id + i
+                                  }-${day.toISOString()}-${i}-data`}
                                   className={`relative text-center p-0 ${customBackground}`}
                                 ></TableCell>
                               );

@@ -201,7 +201,7 @@ export default function CalendarDialog({
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, "do MMMM", { locale: ja })
+                                  format(field.value, "MMMM do", { locale: ja })
                                 ) : (
                                   <span>日付を選ぶ</span>
                                 )}
@@ -241,7 +241,7 @@ export default function CalendarDialog({
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, "do MMMM", { locale: ja })
+                                  format(field.value, "MMMM do", { locale: ja })
                                 ) : (
                                   <span>日付を選ぶ</span>
                                 )}

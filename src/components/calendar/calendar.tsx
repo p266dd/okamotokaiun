@@ -46,8 +46,13 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 // Actions
-import { sortStaff, loadPreviousDays, loadNextDays } from "@/lib/calendar-functions";
-import { fetchStaffWithSchedule, TStaffWithSchedule } from "@/action/staff";
+import {
+  sortSchedules,
+  TSchedule,
+  loadPreviousDays,
+  loadNextDays,
+} from "@/lib/calendar-functions";
+import { getCalendarContent } from "@/action/get-calendar";
 import { fetchShips } from "@/action/ships";
 
 export default function Calendar() {
@@ -113,10 +118,10 @@ export default function Calendar() {
   }
 
   // Fetch all users and their schedule given the date range.
-  const [prevData, setPrevData] = useState<TStaffWithSchedule[] | null>(null);
+  const [prevData, setPrevData] = useState<TSchedule[] | null>(null);
   const { data, isLoading } = useSWR(
     { key: "fetchStaffWithSchedule", firstDay, lastDay, refresh },
-    () => fetchStaffWithSchedule(firstDay, lastDay),
+    () => getCalendarContent({ firstDay, lastDay }),
     {
       onSuccess: (newData) => {
         setPrevData(newData);
@@ -124,12 +129,12 @@ export default function Calendar() {
     }
   );
 
-  const staffList = (data as TStaffWithSchedule[]) ?? (prevData as TStaffWithSchedule[]);
+  const scheduleList = (data as TSchedule[]) ?? (prevData as TSchedule[]);
 
   // Fetch available ships.
   const { data: shipList, isLoading: loadingShips } = useSWR("fetchShips", fetchShips);
 
-  // if (loadingStaffList === true || !staffList) {
+  // if (loadingscheduleList === true || !scheduleList) {
   //   return (
   //     <div className="flex tems-center justify-center gap-3">
   //       <LoaderCircleIcon className="animate-spin" />
@@ -139,7 +144,7 @@ export default function Calendar() {
   // }
 
   // Sort the fetched data by dept, role and shipId.
-  const sortedStaff = sortStaff(staffList, selectedShipId, shipList ? shipList : []);
+  const sortedStaff = sortSchedules(shipList || [], scheduleList);
 
   return (
     <>
@@ -158,18 +163,7 @@ export default function Calendar() {
           {loadingShips === false && shipList && shipList.length > 0 ? (
             shipList.map((ship) => (
               <div key={ship.id}>
-                <Button
-                  variant={
-                    ship.name === "JFE N1 / 清丸"
-                      ? "n1"
-                      : ship.name === "JFE N3 / 第三清丸"
-                      ? "n3"
-                      : ship.name === "扇鳳丸"
-                      ? "n"
-                      : "outline"
-                  }
-                  onClick={() => setSelectedShipId(ship.id)}
-                >
+                <Button variant="outline" onClick={() => setSelectedShipId(ship.id)}>
                   {ship.name}
                 </Button>
               </div>
@@ -228,44 +222,44 @@ export default function Calendar() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedStaff.map((staff, i) => {
-                if ("type" in staff && staff.type === "Ship") {
+              {sortedStaff.map((schedule, i) => {
+                if ("type" in schedule && schedule.type === "Ship") {
                   // Return the Ship Name.
                   return (
-                    <TableRow key={staff.name.toLocaleLowerCase()} className="h-14">
+                    <TableRow key={i} className="h-14">
                       <TableCell className="pl-2">
-                        <span className="">{staff.name}</span>
+                        <span className="">{schedule.name}</span>
                       </TableCell>
                     </TableRow>
                   );
-                } else if ("type" in staff && staff.type === "Department") {
+                } else if ("type" in schedule && schedule.type === "Department") {
                   // Return the Department.
                   return (
                     <TableRow key={i} className="h-6 bg-slate-200/70">
                       <TableCell className="text-slate-700 pl-2 py-0.5 text-xs">
-                        <span className="">{staff.name}</span>
+                        <span className="">{schedule.name}</span>
                       </TableCell>
                     </TableRow>
                   );
-                } else if ("type" in staff && staff.type === "Role") {
+                } else if ("type" in schedule && schedule.type === "Role") {
                   // Return without displaying the Role.
                   return null;
                   // return (
                   //   <TableRow
-                  //     key={staff.name.toLocaleLowerCase()}
+                  //     key={schedule.name.toLocaleLowerCase()}
                   //     className="h-4 bg-slate-200/70"
                   //   >
                   //     <TableCell className="text-slate-700 pl-2 py-0.5 text-xs">
                   //       {/* You can display item.roleName here if desired, or leave it for a visual break */}
-                  //       <span className="">{staff.name}</span>
+                  //       <span className="">{schedule.name}</span>
                   //     </TableCell>
                   //   </TableRow>
                   // );
                 }
                 // Return the staff name.
                 return (
-                  <TableRow key={staff.id} className="hover:bg-gray-100 h-10">
-                    <TableCell className="bg-blue-100 pr-4 sm:pr-12">{`${staff.lastName} ${staff.firstName}`}</TableCell>
+                  <TableRow key={i} className="hover:bg-gray-100 h-10">
+                    <TableCell className="bg-blue-100 pr-4 sm:pr-12">{`${schedule.staff.lastName} ${schedule.staff.firstName}`}</TableCell>
                   </TableRow>
                 );
               })}
@@ -355,46 +349,45 @@ export default function Calendar() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedStaff.map((staff, i) => {
-                  if ("type" in staff && staff.type === "Ship") {
+                {sortedStaff.map((schedule, i) => {
+                  if ("type" in schedule && schedule.type === "Ship") {
                     return (
-                      <TableRow key={staff.name.toLocaleLowerCase()} className="h-14">
+                      <TableRow key={i} className="h-14">
                         <TableCell colSpan={displayedDays.length} className="pl-2">
-                          <span className="text-transparent">{staff.name}</span>
+                          <span className="text-transparent">{schedule.name}</span>
                         </TableCell>
                       </TableRow>
                     );
-                  } else if ("type" in staff && staff.type === "Department") {
+                  } else if ("type" in schedule && schedule.type === "Department") {
                     return (
                       <TableRow key={i} className="h-6 bg-slate-200/70">
                         <TableCell
                           colSpan={displayedDays.length}
                           className="text-slate-700 pl-2 py-0.5 text-xs"
                         >
-                          <span className="text-transparent">{staff.name}</span>
+                          <span className="text-transparent">{schedule.name}</span>
                         </TableCell>
                       </TableRow>
                     );
-                  } else if ("type" in staff && staff.type === "Role") {
+                  } else if ("type" in schedule && schedule.type === "Role") {
                     // Don't show role row.
                     return null;
                   } else {
+                    // Schedule colors.
+                    const color =
+                      schedule.ship.name === "JFE N1 / 清丸"
+                        ? "bg-[#466dbe]"
+                        : schedule.ship.name === "JFE N3 / 第三清丸"
+                        ? "bg-[#e874cd]"
+                        : schedule.ship.name === "扇鳳丸"
+                        ? "bg-[#5ea64d]"
+                        : "bg-primary";
+
                     return (
-                      <TableRow key={staff.id} className="hover:bg-gray-100 h-10">
+                      <TableRow key={i} className="hover:bg-gray-100 h-10">
                         {displayedDays.map((day, i) => {
                           // Find relevant schedule.
                           const currentDay = startOfDay(day);
-                          const schedule = staff.schedule.find(
-                            (s) =>
-                              s.embark &&
-                              typeof s.shipId === "string" &&
-                              isWithinInterval(currentDay, {
-                                start: startOfDay(s.embark),
-                                end: s.desembark
-                                  ? startOfDay(s.desembark)
-                                  : startOfDay(new Date(Date.now())),
-                              })
-                          );
 
                           // Change the background if day is a weekend.
                           let customBackground: string = "";
@@ -427,7 +420,9 @@ export default function Calendar() {
                               cellContent = (
                                 <div className="absolute inset-0 flex items-center justify-end">
                                   <span className="absolute z-20 flex items-center justify-center top-0 right-0 w-full h-full">
-                                    <span className="rounded-full w-4 h-4 bg-primary text-primary-foreground text-xs" />
+                                    <span
+                                      className={`rounded-full w-4 h-4 ${color} text-primary-foreground text-xs`}
+                                    />
                                   </span>
                                 </div>
                               );
@@ -437,9 +432,11 @@ export default function Calendar() {
                             ) {
                               cellContent = (
                                 <div className="absolute inset-0 flex items-center justify-end">
-                                  <span className="block w-1/2 h-1 bg-primary"></span>
+                                  <span className={`block w-1/2 h-1 ${color}`}></span>
                                   <span className="absolute z-20 flex items-center justify-center top-0 right-0 w-full h-full">
-                                    <span className="rounded-full w-4 h-4 bg-primary text-primary-foreground text-xs" />
+                                    <span
+                                      className={`rounded-full w-4 h-4 ${color} text-primary-foreground text-xs`}
+                                    />
                                   </span>
                                 </div>
                               );
@@ -450,17 +447,28 @@ export default function Calendar() {
                             ) {
                               cellContent = (
                                 <div className="absolute inset-0 flex items-center justify-start">
-                                  <span className="block w-1/2 h-1 bg-primary"></span>
+                                  <span className={`block w-1/2 h-1 ${color}`}></span>
                                   <span className="absolute z-20 flex items-center justify-center top-0 right-0 w-full h-full">
-                                    <span className="rounded-full w-4 h-4 bg-primary text-primary-foreground text-xs" />
+                                    <span
+                                      className={`rounded-full w-4 h-4 ${color} text-primary-foreground text-xs`}
+                                    />
                                   </span>
+                                </div>
+                              );
+                            } else if (
+                              isWithinInterval(day, {
+                                start: scheduleStart,
+                                end: scheduleEnd,
+                              })
+                            ) {
+                              cellContent = (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <span className={`block w-full h-1 ${color}`}></span>
                                 </div>
                               );
                             } else {
                               cellContent = (
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                  <span className="block w-full h-1 bg-primary"></span>
-                                </div>
+                                <div className="absolute inset-0 flex items-center justify-center"></div>
                               );
                             }
 
@@ -481,7 +489,7 @@ export default function Calendar() {
                           } else {
                             return (
                               <TableCell
-                                key={`${staff.id}-${day.toISOString()}-${i}-data`}
+                                key={`${schedule.id + i}-${day.toISOString()}-${i}-data`}
                                 onMouseEnter={() => setHoveredColumnIndex(i)}
                                 className={`relative text-center p-0 ${customBackground}`}
                               ></TableCell>
