@@ -134,17 +134,8 @@ export default function Calendar() {
   // Fetch available ships.
   const { data: shipList, isLoading: loadingShips } = useSWR("fetchShips", fetchShips);
 
-  // if (loadingscheduleList === true || !scheduleList) {
-  //   return (
-  //     <div className="flex tems-center justify-center gap-3">
-  //       <LoaderCircleIcon className="animate-spin" />
-  //       Loading...
-  //     </div>
-  //   );
-  // }
-
   // Sort the fetched data by dept, role and shipId.
-  const sortedStaff = sortSchedules(shipList || [], scheduleList);
+  const sortedStaff = shipList ? sortSchedules(shipList, selectedShipId, scheduleList) : scheduleList ?? [];
 
   return (
     <>
@@ -163,7 +154,7 @@ export default function Calendar() {
           {loadingShips === false && shipList && shipList.length > 0 ? (
             shipList.map((ship) => (
               <div key={ship.id}>
-                <Button variant="outline" onClick={() => setSelectedShipId(ship.id)}>
+                <Button variant={ selectedShipId === ship.id ? "default" : "outline" } onClick={() => setSelectedShipId(ship.id)}>
                   {ship.name}
                 </Button>
               </div>
@@ -187,7 +178,7 @@ export default function Calendar() {
         <div className="hidden md:flex items-center gap-4">
           <Button variant="outline" asChild>
             <Link href="/print">
-              <PrinterIcon /> Print Calendar
+              <PrinterIcon /> 印刷
             </Link>
           </Button>
 
@@ -381,7 +372,7 @@ export default function Calendar() {
                         ? "bg-[#e874cd]"
                         : schedule.ship.name === "扇鳳丸"
                         ? "bg-[#5ea64d]"
-                        : "bg-primary";
+                        : schedule.ship.name === "千島丸" ? "bg-[#f5d60f]" : "bg-primary";
 
                     return (
                       <TableRow key={i} className="hover:bg-gray-100 h-10">

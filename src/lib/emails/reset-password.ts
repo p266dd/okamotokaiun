@@ -10,13 +10,11 @@ export async function resetPassword({
   email: string;
 }) {
   const text = `
-    Hello ${name},\n
-    Someone has requested a password recovery for your account!/n
-    Use the URL below in your browser to reset your password.\n\n
+    ${name},\n
+    下のボタンをクリックしてパスワードをリセットしてください。\n\n
     ${process.env.NEXT_PUBLIC_BASE_URL}/login?action=reset&token=${token}\n\n
-    If you didn't request this, you can safely ignore this email.\n\n
-    Best,\n
-    Okamoto Kaiun Team\n
+    パスワードリセットをリクエストしていない場合は、このメールは無視してください。\n\n
+    は削除してください。\n
   `;
 
   const html = `
@@ -60,23 +58,22 @@ export async function resetPassword({
       </head>
       <body>
         <div class="container">
-          <h2>Password Recovery</h2>
+          <h2>パスワードリセット</h2>
           <div>
             <p>
-              Someone has requested a password recovery for your account! <br />
-              Click the button below to reset your password.
+              下のボタンをクリックしてパスワードをリセットしてください。<br />
             </p>
           </div>
           <div>
-            <a href="${process.env.NEXT_PUBLIC_BASE_URL}/auth/reset?token=${token}" target="_blank" class="button">Reset Password</a>
+            <a href="${process.env.NEXT_PUBLIC_BASE_URL}/auth/reset?token=${token}" target="_blank" class="button">パスワードリセット</a>
           </div>
           <div>
             <p class="token">
               ${process.env.NEXT_PUBLIC_BASE_URL}/auth/reset?token=${token}
             </p>
           </div>
-          <p>If you didn't request this, you can safely ignore this email.</p>
-          <p class="footer">Best regards, <br> Okamoto Kaiun Team</p>
+          <p>パスワードリセットをリクエストしていない場合は、このメールは無視してください。</p>
+          <p class="footer">は削除してください。</p>
         </div>
       </body>
     </html>
@@ -84,7 +81,7 @@ export async function resetPassword({
 
   return await sendEmail({
     to: email,
-    subject: "Password Recovery - Okamoto Kaiun",
+    subject: "パスワードリセット - Okamoto Kaiun",
     text: text,
     html: html,
   });

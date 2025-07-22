@@ -144,7 +144,7 @@ export const EmbarkAction = async function (
   // Validate data.
   const validateSchema = dataSchema.safeParse(data);
   if (validateSchema?.error) {
-    return { error: "Invalid form data." };
+    return { error: "アカウントが見つかりません。" };
   }
 
   const { code, status: newDesiredStatus, ship: shipIdFromForm } = validateSchema.data;

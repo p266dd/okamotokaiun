@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader, Lock } from "lucide-react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import { toast } from "sonner";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -23,10 +22,6 @@ export default function LoginForm() {
     error: null,
   });
 
-  if (state && state.error !== null && typeof state.error === "string") {
-    toast.error(state.error);
-    return;
-  }
   if (state && "success" in state) {
     router.push("/");
   }

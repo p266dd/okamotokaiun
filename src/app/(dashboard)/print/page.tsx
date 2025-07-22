@@ -92,7 +92,7 @@ export default function PrintCalendarPage() {
   const scheduleList = (data as TSchedule[]) ?? (prevData as TSchedule[]);
 
   // Sort the fetched data by dept, role and shipId.
-  const sortedStaff = sortSchedules(availableShips || [], scheduleList);
+  const sortedStaff = availableShips ? sortSchedules(availableShips, selectedShipId, scheduleList) : scheduleList ?? [];
 
   const printPage = () => {
     window.print();
@@ -274,14 +274,14 @@ export default function PrintCalendarPage() {
                       return null;
                     } else {
                       // Schedule colors.
-                      const color =
-                        schedule.ship.name === "JFE N1 / 清丸"
-                          ? "bg-[#466dbe]"
-                          : schedule.ship.name === "JFE N3 / 第三清丸"
-                          ? "bg-[#e874cd]"
-                          : schedule.ship.name === "扇鳳丸"
-                          ? "bg-[#5ea64d]"
-                          : "bg-primary";
+                    const color =
+                      schedule.ship.name === "JFE N1 / 清丸"
+                        ? "bg-[#466dbe]"
+                        : schedule.ship.name === "JFE N3 / 第三清丸"
+                        ? "bg-[#e874cd]"
+                        : schedule.ship.name === "扇鳳丸"
+                        ? "bg-[#5ea64d]"
+                        : schedule.ship.name === "千島丸" ? "bg-[#f5d60f]" : "bg-primary";
 
                       return (
                         <TableRow key={i} className="hover:bg-gray-100 h-10">

@@ -26,11 +26,17 @@ const ROLE_ORDER: Record<TDepartment, string[]> = {
 };
 export function sortSchedules(
   ships: Ship[],
+  ship: string | undefined,
   scheduleList: TSchedule[]
 ): TSortedSchedule[] {
   const sorted: TSortedSchedule[] = [];
 
-  for (const ship of ships) {
+  // Get information of the selected ship.
+  const selectedShip = ship ? ships.filter((s) => s.id === ship) : undefined;
+
+  const shipList = selectedShip ? selectedShip : ships;
+
+  for (const ship of shipList) {
     const shipId = ship.id;
 
     // Schedule assigned to the ship
