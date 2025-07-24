@@ -57,7 +57,10 @@ export default function StaffForm({
   setDepartment: React.Dispatch<React.SetStateAction<string | null>>;
 }) {
   // Get list of ships.
-  const { data: shipList, isLoading: loadingShips } = useSWR("fetchShips", fetchShips);
+  const { data: shipList, isLoading: loadingShips } = useSWR(
+    "fetchShips",
+    fetchShips
+  );
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -89,12 +92,12 @@ export default function StaffForm({
       });
 
       if (!response || response.error !== null) {
-        toast.error("An error occured.");
+        toast.error("エラーが発生しました。");
         setErrorMessage(response.error);
         return;
       }
 
-      toast.success("New staff has been added.");
+      toast.success("スタッフを追加しました。");
       form.reset();
 
       mutate("fetchStaff");
@@ -107,12 +110,12 @@ export default function StaffForm({
       salary: parseInt(values.salary.toString()),
     });
     if (!response || response.error !== null) {
-      toast.error("A problem happen while adding a new staff.");
+      toast.error(response.error);
       setErrorMessage(response.error);
       return;
     }
 
-    toast.success("New staff has been added.");
+    toast.success("スタッフを追加しました。");
     form.reset();
 
     mutate("fetchStaff");
@@ -130,7 +133,12 @@ export default function StaffForm({
               <FormItem className="flex-1">
                 <FormLabel>姓</FormLabel>
                 <FormControl>
-                  <Input placeholder="" autoComplete="off" required {...field} />
+                  <Input
+                    placeholder=""
+                    autoComplete="off"
+                    required
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
@@ -144,7 +152,12 @@ export default function StaffForm({
               <FormItem className="flex-1">
                 <FormLabel>名</FormLabel>
                 <FormControl>
-                  <Input placeholder="" autoComplete="off" required {...field} />
+                  <Input
+                    placeholder=""
+                    autoComplete="off"
+                    required
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
@@ -324,7 +337,11 @@ export default function StaffForm({
               <Button type="submit" variant="success">
                 <SaveIcon /> 変更を保存
               </Button>
-              <Button variant="outline" type="button" onClick={() => setEdit(null)}>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => setEdit(null)}
+              >
                 キャンセル
               </Button>
             </>

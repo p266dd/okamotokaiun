@@ -8,8 +8,18 @@ import { fetchShips, updateShip, deleteShip, createShip } from "@/action/ships";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { PencilIcon, PlusCircleIcon, SaveIcon, ShipIcon, TrashIcon } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  PencilIcon,
+  PlusCircleIcon,
+  SaveIcon,
+  ShipIcon,
+  TrashIcon,
+} from "lucide-react";
 
 // Type
 import { Ship } from "@/lib/prisma/generate";
@@ -20,12 +30,12 @@ const NewFormInput = () => {
 
   const handleSave = async () => {
     if (!newName || newName === "") {
-      toast.error("No ship name provided.");
+      toast.error("船名を入力してください。");
       return;
     }
     const validateName = string().safeParse(newName);
     if (!validateName.success) {
-      toast.error("Invalid ship name.");
+      toast.error("この船名は登録できません。");
       return;
     }
 
@@ -33,11 +43,11 @@ const NewFormInput = () => {
     const createdShip = await createShip({ name: newName });
 
     if (!createdShip) {
-      toast.error("An error occured.");
+      toast.error("エラーが発生しました。");
       return;
     }
 
-    toast.success("Ship has been created.");
+    toast.success("船舶が追加されました。");
     mutate("fetchShips");
     setNewName(null);
     setOpen(false);
@@ -74,12 +84,12 @@ const EditFormInput = ({ ship }: { ship: Ship }) => {
 
   const handleSave = async () => {
     if (!newName || newName === "") {
-      toast.error("No ship name provided.");
+      toast.error("船名を入力してください。");
       return;
     }
     const validateName = string().safeParse(newName);
     if (!validateName.success) {
-      toast.error("Invalid ship name.");
+      toast.error("この船名は登録できません。");
       return;
     }
 
@@ -87,11 +97,11 @@ const EditFormInput = ({ ship }: { ship: Ship }) => {
     const updatedShip = await updateShip({ id: ship.id, name: newName });
 
     if (!updatedShip) {
-      toast.error("An error occured.");
+      toast.error("エラーが発生しました。");
       return;
     }
 
-    toast.success("Ship name has been updated.");
+    toast.success("船名が更新されました。");
     mutate("fetchShips");
     setNewName(null);
     setOpen(false);
@@ -124,16 +134,19 @@ const EditFormInput = ({ ship }: { ship: Ship }) => {
 };
 
 export default function AddShip() {
-  const { data: ships, isLoading: loadingShips } = useSWR("fetchShips", fetchShips);
+  const { data: ships, isLoading: loadingShips } = useSWR(
+    "fetchShips",
+    fetchShips
+  );
 
   const handleDelete = async (shipId: string) => {
     if (!shipId || shipId === "") {
-      toast.error("No ship id provided.");
+      toast.error("船名を入力してください。");
       return;
     }
     const validateId = string().safeParse(shipId);
     if (!validateId.success) {
-      toast.error("Invalid ship id.");
+      toast.error("この船名は登録できません。");
       return;
     }
 
@@ -141,11 +154,11 @@ export default function AddShip() {
     const deletedShip = await deleteShip(validateId.data);
 
     if (!deletedShip) {
-      toast.error("An error occured.");
+      toast.error("エラーが発生しました。");
       return;
     }
 
-    toast.success("Ship has been deleted.");
+    toast.success("船名を削除しました。");
     mutate("fetchShips");
   };
 
@@ -164,7 +177,10 @@ export default function AddShip() {
             <div className="flex flex-col gap-1">
               {ships &&
                 ships.map((ship) => (
-                  <div key={ship.id} className="flex items-center justify-between">
+                  <div
+                    key={ship.id}
+                    className="flex items-center justify-between"
+                  >
                     <div className="text-sm">{ship.name}</div>
                     <div className="flex items-center">
                       <EditFormInput ship={ship} />

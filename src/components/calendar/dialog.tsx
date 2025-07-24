@@ -41,7 +41,11 @@ import {
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { CalendarIcon, ShipIcon } from "lucide-react";
 
 // Type
@@ -112,7 +116,7 @@ export default function CalendarDialog({
       return;
     }
 
-    toast.success("Changes have been saved.");
+    toast.success("変更が保存されました。.");
     setRefresh((prev) => prev + 1);
     setEdit(false);
   }
@@ -147,7 +151,9 @@ export default function CalendarDialog({
               <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
                 {schedule.staff?.lastName + " " + schedule.staff?.firstName}
               </h3>
-              <div className="text-sm text-gray-400 mb-5">{schedule.staff?.role}</div>
+              <div className="text-sm text-gray-400 mb-5">
+                {schedule.staff?.role}
+              </div>
               <div className="flex flex-col gap-3 mb-4">
                 <FormField
                   control={form.control}
@@ -158,7 +164,10 @@ export default function CalendarDialog({
                         <ShipIcon className="stroke-primary" />
                         乗船した船舶
                       </FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="NFE 1" />

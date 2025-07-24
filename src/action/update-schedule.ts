@@ -17,7 +17,7 @@ export async function updateScheduleData(schedule: {
     });
 
     if (!existingSchedule) {
-      const errorMsg = "Original schedule not found.";
+      const errorMsg = "乗降情報が見つかりません。";
       console.error("Error fetching existing schedule:", errorMsg);
       return { error: errorMsg };
     }
@@ -40,7 +40,7 @@ export async function updateScheduleData(schedule: {
 
       if (!scheduleUpdateShip) {
         console.error(`Error updating shipId in schedule.`);
-        return { error: `Failed to update associated schedule's ship` };
+        return { error: `更新できませんでした。` };
       }
     }
 
@@ -66,7 +66,7 @@ export async function updateScheduleData(schedule: {
       });
 
       if (!scheduleUpdateDbResult) {
-        const errorMsg = "Failed to update schedule.";
+        const errorMsg = "更新できませんでした。";
         console.error("Error updating schedule data:", errorMsg);
         return { error: errorMsg };
       }
@@ -78,7 +78,7 @@ export async function updateScheduleData(schedule: {
     return { error: null, data: updatedScheduleData };
   } catch (error: unknown) {
     console.error("Unexpected error in updateScheduleData:", error);
-    const errorMessage = "An unexpected error occurred.";
+    const errorMessage = "エラーが発生しました。";
     return { error: errorMessage };
   }
 }
