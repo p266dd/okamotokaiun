@@ -166,7 +166,7 @@ export default function EmbarkForm() {
                     className="flex-grow"
                   >
                     {isPending ? <LoaderCircleIcon /> : null}
-                    {staff?.status ? "降船" : "乗船"}
+                    {staff?.status ? "下船" : "乗船"}
                   </Button>
                 </CardContent>
               </Card>

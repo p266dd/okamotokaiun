@@ -39,6 +39,8 @@ export async function getCalendarContent({
       },
     });
 
+    console.log(scheduleList);
+
     if (scheduleList.length === 0) {
       console.warn("No schedules found.");
       return [];

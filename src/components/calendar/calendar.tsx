@@ -135,7 +135,9 @@ export default function Calendar() {
   const { data: shipList, isLoading: loadingShips } = useSWR("fetchShips", fetchShips);
 
   // Sort the fetched data by dept, role and shipId.
-  const sortedStaff = shipList ? sortSchedules(shipList, selectedShipId, scheduleList) : scheduleList ?? [];
+  const sortedStaff = shipList
+    ? sortSchedules(shipList, selectedShipId, scheduleList)
+    : scheduleList ?? [];
 
   return (
     <>
@@ -154,7 +156,10 @@ export default function Calendar() {
           {loadingShips === false && shipList && shipList.length > 0 ? (
             shipList.map((ship) => (
               <div key={ship.id}>
-                <Button variant={ selectedShipId === ship.id ? "default" : "outline" } onClick={() => setSelectedShipId(ship.id)}>
+                <Button
+                  variant={selectedShipId === ship.id ? "default" : "outline"}
+                  onClick={() => setSelectedShipId(ship.id)}
+                >
                   {ship.name}
                 </Button>
               </div>
@@ -372,7 +377,9 @@ export default function Calendar() {
                         ? "bg-[#e874cd]"
                         : schedule.ship.name === "扇鳳丸"
                         ? "bg-[#5ea64d]"
-                        : schedule.ship.name === "千島丸" ? "bg-[#f5d60f]" : "bg-primary";
+                        : schedule.ship.name === "千島丸"
+                        ? "bg-[#f5d60f]"
+                        : "bg-primary";
 
                     return (
                       <TableRow key={i} className="hover:bg-gray-100 h-10">
