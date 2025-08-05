@@ -82,7 +82,7 @@ export default function LoginForm() {
           <Link className="text-primary" href="/auth/embark" prefetch={true}>
             <span className="flex items-center gap-2">
               <LoadingIndicator />
-              乗降船登録はこちら
+              乗下船登録はこちら
             </span>
           </Link>
           {state?.error && (

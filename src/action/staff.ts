@@ -23,7 +23,7 @@ export async function fetchStaff() {
       },
     });
 
-    if (!staff || staff.length === 0) {
+    if (!staff) {
       return { error: "アカウントが見つかりません。" };
     }
 
