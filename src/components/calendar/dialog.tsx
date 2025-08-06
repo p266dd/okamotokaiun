@@ -9,7 +9,7 @@ import { ja } from "date-fns/locale";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-import { updateScheduleData } from "@/action/update-schedule";
+import { updateScheduleData, deleteSchedule } from "@/action/update-schedule";
 
 // Shadcn
 import {
@@ -42,7 +42,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, ShipIcon } from "lucide-react";
+import { CalendarIcon, LoaderCircleIcon, ShipIcon, Trash2Icon } from "lucide-react";
 
 // Type
 import { Prisma } from "@/lib/prisma/generate";
@@ -77,6 +77,7 @@ export default function CalendarDialog({
   setRefresh: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const [edit, setEdit] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Activate the save button.
   const handleChange = useCallback(() => {
@@ -111,6 +112,23 @@ export default function CalendarDialog({
       toast.error(updatedSchedule.error);
       return;
     }
+
+    toast.success("変更が保存されました。.");
+    setRefresh((prev) => prev + 1);
+    setEdit(false);
+  }
+
+  async function handleDelete(scheduleId: string) {
+    setLoading(true);
+
+    const deletedSchedule = await deleteSchedule(schedule.id);
+
+    if (deletedSchedule.error) {
+      toast.error(deletedSchedule.error);
+      return;
+    }
+
+    setLoading(false);
 
     toast.success("変更が保存されました。.");
     setRefresh((prev) => prev + 1);
@@ -309,16 +327,43 @@ export default function CalendarDialog({
             </div>
           </form>
         </Form>
-        {edit && (
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">キャンセル</Button>
-            </DialogClose>
-            <Button type="submit" onClick={form.handleSubmit(onSubmit)}>
-              変更を保存
-            </Button>
-          </DialogFooter>
-        )}
+
+        <DialogFooter className="flex-row justify-between sm:justify-between">
+          <Button
+            className="self-start"
+            variant="destructive"
+            type="button"
+            disabled={loading}
+            onClick={() => handleDelete(schedule.id)}
+          >
+            {loading ? (
+              <LoaderCircleIcon className="animate-spin" />
+            ) : (
+              <>
+                削除 <Trash2Icon />
+              </>
+            )}
+          </Button>
+          {edit && (
+            <div className="flex gap-3 justify-end">
+              <DialogClose asChild>
+                <Button
+                  onClick={() => {
+                    form.setValue("embark", schedule.embark);
+                    form.setValue("desembark", schedule.desembark);
+                    setEdit(false);
+                  }}
+                  variant="outline"
+                >
+                  キャンセル
+                </Button>
+              </DialogClose>
+              <Button type="submit" onClick={form.handleSubmit(onSubmit)}>
+                変更を保存
+              </Button>
+            </div>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

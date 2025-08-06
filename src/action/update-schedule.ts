@@ -82,3 +82,25 @@ export async function updateScheduleData(schedule: {
     return { error: errorMessage };
   }
 }
+
+export async function deleteSchedule(scheduleId: string) {
+  try {
+    const deletedSchedule = await prisma.schedule.delete({
+      where: { id: scheduleId },
+    });
+
+    if (!deleteSchedule) {
+      const errorMsg = "削除できませんでした。";
+      console.error("Error deleting schedule:", errorMsg);
+      return { error: errorMsg };
+    }
+
+    revalidatePath("/payroll");
+    revalidatePath("/");
+    return { error: null, data: deletedSchedule };
+  } catch (error) {
+    console.error("Unexpected error in updateScheduleData:", error);
+    const errorMessage = "削除できませんでした。";
+    return { error: errorMessage };
+  }
+}

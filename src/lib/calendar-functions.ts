@@ -80,7 +80,7 @@ export function sortSchedules(
     }
   }
 
-  console.log(sorted);
+  // console.log(sorted);
 
   return sorted;
 }
