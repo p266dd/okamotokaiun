@@ -121,7 +121,7 @@ export default function CalendarDialog({
   async function handleDelete(scheduleId: string) {
     setLoading(true);
 
-    const deletedSchedule = await deleteSchedule(schedule.id);
+    const deletedSchedule = await deleteSchedule(scheduleId);
 
     if (deletedSchedule.error) {
       toast.error(deletedSchedule.error);
