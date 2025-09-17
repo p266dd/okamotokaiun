@@ -19,7 +19,7 @@ export async function fetchStaff() {
         ship: true,
       },
       orderBy: {
-        lastName: "asc",
+        code: "asc",
       },
     });
 
