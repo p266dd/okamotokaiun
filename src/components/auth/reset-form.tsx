@@ -87,7 +87,7 @@ export default function ResetForm() {
           {state?.error && (
             <Alert variant="destructive" className="bg-red-50">
               <Lock />
-              <AlertTitle>{state.error}</AlertTitle>
+              <AlertTitle className="line-clamp-none">{state.error}</AlertTitle>
             </Alert>
           )}
         </div>

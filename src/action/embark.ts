@@ -22,12 +22,27 @@ export const EmbarkAction = async function (
   formData: FormData
 ): Promise<EmbarkState> {
   // Helper functions
+
   async function embarkStaff(
     staffId: string,
     shipToEmbarkId: string
   ): Promise<StaffWithShip | null> {
     console.log(staffId, shipToEmbarkId);
     try {
+      // const alreadyEmbarked = await prisma.schedule.findFirst({
+      //   where: {
+      //     staffId: staffId,
+      //     shipId: shipToEmbarkId,
+      //   },
+      // });
+
+      // if (alreadyEmbarked?.embark !== null && alreadyEmbarked?.desembark !== null) {
+      // const timeNow = Date.now();
+      // if (timeNow >= alreadyEmbarked?.embark.getMilliseconds && timeNow <= alreadyEmbarked?.desembark) {
+      //   console.log("Cannot complete, already embarked and disembarked");
+      // }
+      // }
+
       const result = await prisma.staff.update({
         data: {
           status: true,
@@ -155,6 +170,20 @@ export const EmbarkAction = async function (
     include: { ship: true },
   });
 
+  console.log("staff", staffResult);
+
+  const lastSchedule = (
+    await prisma.schedule.findMany({
+      where: {
+        staffId: staffResult?.id,
+      },
+      orderBy: {
+        embark: "desc",
+      },
+      take: 1,
+    })
+  )[0];
+
   if (!staffResult) {
     return { error: "Staff not found." };
   }
@@ -172,6 +201,18 @@ export const EmbarkAction = async function (
   let operationResult: StaffWithShip | null = null;
 
   if (newDesiredStatus === true) {
+    const lastScheduleDesembark = lastSchedule?.desembark;
+
+    if (lastScheduleDesembark !== null) {
+      if (lastScheduleDesembark > new Date()) {
+        return {
+          error:
+            "あなたの乗船期間は管理者によって登録されています。管理者へご確認ください。",
+          staff: getCurrentStaffUIState(staff, code),
+        };
+      }
+    }
+
     // Attempting to embark
     if (!shipIdFromForm) {
       return {
